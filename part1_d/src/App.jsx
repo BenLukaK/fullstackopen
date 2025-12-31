@@ -6,18 +6,28 @@ const App = () => {
   const [neutral, setNeutral] = useState(0)
   const [bad, setBad] = useState(0)
 
+  const totalNum = good + neutral + bad;
+  const avgRating = totalNum === 0 ? 0 : (good * 1 + neutral * 0 + bad * -1) / totalNum;
+  const posPercent = totalNum === 0 ? 0 : good / totalNum;
+
+
+  const helper = (stateVar, setStateFunc) => {
+    return () => {
+      setStateFunc(stateVar + 1); 
+    }
+  };
 
   const RateButton = ({stateVar, setStateFunc, buttonText}) => {
     return (
-      <button onClick={() => setStateFunc(stateVar + 1)}>{buttonText}</button>
+      <button onClick={helper(stateVar, setStateFunc, buttonText)}>{buttonText}</button>
     )
-  }
+  };
 
   const RateResult = ({stateVar, rateText}) => {
     return (
       <div>{rateText} {stateVar}</div>
     )
-  }
+  };
 
   return (
     <div>
@@ -29,8 +39,11 @@ const App = () => {
       <RateResult stateVar={good} rateText="good" />
       <RateResult stateVar={neutral} rateText="neutral" />
       <RateResult stateVar={bad} rateText="bad" />
+      <RateResult stateVar={totalNum} rateText="all" />
+      <RateResult stateVar={avgRating} rateText="average" />
+      <RateResult stateVar={posPercent} rateText="positive" />
     </div>
-  )
+  );
 }
 
 export default App
