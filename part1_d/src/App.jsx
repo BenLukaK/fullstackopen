@@ -33,20 +33,27 @@ const App = () => {
     return (
       <div>
         <h1>statistics</h1>
-        <StatisticLine value={good} text="good" />
-        <StatisticLine value={neutral} text="neutral" />
-        <StatisticLine value={bad} text="bad" />
-        <StatisticLine value={totalNum} text="all" />
-        <StatisticLine value={avgRating} text="average" />
-        <StatisticLine value={posPercent} text="positive" />
+        <table>
+          <tbody>
+            <StatisticLine value={good} text="good" key="1" />
+            <StatisticLine value={neutral} text="neutral" key="2" />
+            <StatisticLine value={bad} text="bad" key="3" />
+            <StatisticLine value={totalNum} text="all" key="4" />
+            <StatisticLine value={avgRating} text="average" key="5" />
+            <StatisticLine value={posPercent} text="positive" key="6" />
+          </tbody>
+        </table>
       </div>
     )
   }
 
 
-  const StatisticLine = ({value, text}) => {
+  const StatisticLine = ({value, text, id}) => {
     return (
-      <div>{text} {value}</div>
+      <tr key={id}>
+        <td>{text}</td>
+        <td>{value}</td>
+      </tr>
     )
   }
 
