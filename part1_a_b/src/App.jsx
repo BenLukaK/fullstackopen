@@ -1,15 +1,7 @@
 
-  
-
-/* const Total = (props) => {
-  return (
-    <p>Number of exercises {props.parts.reduce((sum, part) => sum + part.exercises, 0)}</p>
-  ) */
-
-
 const Header = ({courseName}) => {
-    return <h1>{courseName}</h1>
-  }
+  return <h1>{courseName}</h1>
+}
 
 const Content = ({parts}) => {
   return (
@@ -33,8 +25,14 @@ const Course = ({course}) => {
     <div>
       <Header courseName={course.name}/>
       <Content parts={course.parts}/>
-{/*       <Total parts={course.parts}/> */}
+      <Total parts={course.parts}/>
     </div>
+  )
+}
+
+const Total = ({parts}) => {
+  return (
+    <p>Total of {parts.reduce((sum, part) => sum + part.exercises, 0)} exercises</p>
   )
 }
 
