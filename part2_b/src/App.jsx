@@ -1,5 +1,41 @@
 import { useState } from 'react'
 
+const Filter = ({filterText, filterHandler}) => {
+  return (
+    <div>
+      filter shown with <input value={filterText} onChange={filterHandler} />
+    </div>
+  )
+}
+
+const PersonForm = (props) => {
+  return (
+    <form onSubmit={props.onSubmit}>
+      <div>
+        name: <input value={props.newName} onChange={props.onNameChange} />
+      </div>
+      <div>
+        number: <input value={props.newNumber} onChange={props.onNumberChange} />
+      </div>
+      <div>
+        <button type="submit">add</button>
+      </div>
+    </form>
+  )
+}
+
+const Persons = ({persons}) => {
+  return (
+    <div>
+      {persons.map(person => <Person key={person.name} person={person} />)}
+    </div>
+  )
+}
+
+const Person = ({person}) => {
+  return <div>{person.name} {person.number}</div>
+}
+
 const App = () => {
   const [persons, setPersons] = useState([
     { name: 'Arto Hellas', number: '040-123456', id: 1 },
@@ -25,7 +61,7 @@ const App = () => {
 
   const filteredPersons = persons.filter(person => person.name.toLowerCase().includes(nameSelect.toLowerCase()))
 
-  const addNameHandler = (e) => {
+  const addPersonHandler = (e) => {
     e.preventDefault()
     const nameExists = persons.some(person => person.name === newName)
     if (!nameExists) {
@@ -38,26 +74,15 @@ const App = () => {
     }
   }
 
+
   return (
     <div>
       <h2>Phonebook</h2>
-      <div>
-        filter shown with <input value={nameSelect} onChange={nameSelectHandler} />
-      </div>
-      <h2>Add a new</h2>
-      <form onSubmit={addNameHandler}>
-        <div>
-          name: <input value={newName} onChange={nameChangeHandler} />
-        </div>
-        <div>
-          number: <input value={newNumber} onChange={numberChangeHandler} />
-        </div>
-        <div>
-          <button type="submit">add</button>
-        </div>
-      </form>
-      <h2>Numbers</h2>
-      {filteredPersons.map(person => <div>{person.name} {person.number}</div>)}
+      <Filter filterText={nameSelect} filterHandler={nameSelectHandler} />
+      <h3>Add a new</h3>
+      <PersonForm newName={newName} newNumber={newNumber} onNameChange={nameChangeHandler} onNumberChange={numberChangeHandler} onSubmit={addPersonHandler} />
+      <h3>Numbers</h3>
+      <Persons persons={filteredPersons} />
     </div>
   )
 }
