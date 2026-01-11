@@ -70,10 +70,14 @@ const App = () => {
     e.preventDefault()
     const nameExists = persons.some(person => person.name === newName)
     if (!nameExists) {
-      const newNameObj = {name: newName, number: newNumber}
-      setPersons(persons.concat(newNameObj))
-      setNewName('')
-      setNewNumber('')
+      const newObj = {name: newName, number: newNumber}
+      axios
+        .post('http://localhost:3001/persons', newObj)
+        .then(response => {
+          setPersons(persons.concat(response.data))
+          setNewName('')
+          setNewNumber('')
+        })
     } else {
       alert(`${newName} is already added to phonebook`)
     }
