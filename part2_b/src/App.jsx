@@ -25,17 +25,23 @@ const PersonForm = (props) => {
   )
 }
 
-const Persons = ({persons}) => {
+const Persons = ({persons, deleteHandler}) => {
   return (
     <div>
-      {persons.map(person => <Person key={person.id} person={person} />)}
+      {persons.map(person => <Person key={person.id} person={person} deleteHandler={() => deleteHandler(person.id)} />)}
     </div>
   )
 }
 
-const Person = ({person}) => {
-  return <div>{person.name} {person.number}</div>
+const Person = ({person, deleteHandler}) => {
+  return (
+    <div>
+      {person.name} {person.number} <button onClick={deleteHandler}>delete</button>
+    </div>
+  )
 }
+
+ 
 
 const App = () => {
   const [persons, setPersons] = useState([])
@@ -68,6 +74,7 @@ const App = () => {
   const addPersonHandler = (e) => {
     e.preventDefault()
     const nameExists = persons.some(person => person.name === newName)
+
     if (!nameExists) {
       const newObj = {name: newName, number: newNumber}
       personService
@@ -78,7 +85,26 @@ const App = () => {
           setNewNumber('')
         })
     } else {
-      alert(`${newName} is already added to phonebook`)
+      if (window.confirm(`${newName} is already added to phonebook, replace the old number with a new one?`)) {
+        const oldPerson = persons.find(p => p.name === newName)
+        const newObj = {name: newName, number: newNumber}
+        personService
+          .update(oldPerson.id, newObj)
+          .then(updatedPerson => {
+            setPersons(persons.map(person => person.id === oldPerson.id ? updatedPerson : person))
+          })
+      }
+    }
+  }
+
+  const deleteHandler = id => {
+    const deletedPerson = persons.find(p => p.id === id)
+    if (window.confirm(`Delete ${deletedPerson.name}?`)) {
+      personService
+        .remove(id)
+        .then(deletedPerson => {
+          setPersons(persons.filter(person => person.id !== deletedPerson.id))
+        })
     }
   }
 
@@ -90,7 +116,7 @@ const App = () => {
       <h3>Add a new</h3>
       <PersonForm newName={newName} newNumber={newNumber} onNameChange={nameChangeHandler} onNumberChange={numberChangeHandler} onSubmit={addPersonHandler} />
       <h3>Numbers</h3>
-      <Persons persons={filteredPersons} />
+      <Persons persons={filteredPersons} deleteHandler={deleteHandler} />
     </div>
   )
 }
