@@ -41,6 +41,28 @@ const Person = ({person, deleteHandler}) => {
   )
 }
 
+const Notification = ({message}) => {
+  const infoStyle = {
+    color: 'green',
+    background: 'lightgrey',
+    fontSize: '20px',
+    borderStyle: 'solid',
+    borderRadius: '5px',
+    padding: '10px',
+    marginBottom: '10px'
+  }
+
+  if (message === null) {
+    return null
+  }
+
+  return (
+    <div style={infoStyle}>
+      {message}
+    </div>
+  )
+}
+
  
 
 const App = () => {
@@ -48,6 +70,7 @@ const App = () => {
   const [newName, setNewName] = useState('')
   const [newNumber, setNewNumber] = useState('')
   const [nameSelect, setNameSelect] = useState('')
+  const [infoMsg, setInforMsg] = useState(null)
 
   useEffect(() => {
     personService
@@ -69,29 +92,41 @@ const App = () => {
     setNameSelect(e.target.value)
   }
 
+  const showNotification = (msg, duration) => {
+    setInforMsg(msg)
+    setTimeout(() => {
+      setInforMsg(null)
+    }, duration)
+  }
+
   const filteredPersons = persons.filter(person => person.name.toLowerCase().includes(nameSelect.toLowerCase()))
 
   const addPersonHandler = (e) => {
     e.preventDefault()
     const nameExists = persons.some(person => person.name === newName)
-
     if (!nameExists) {
       const newObj = {name: newName, number: newNumber}
+
       personService
         .create(newObj)
         .then(newPerson => {
           setPersons(persons.concat(newPerson))
           setNewName('')
           setNewNumber('')
+          showNotification(`Added ${newPerson.name}`, 4000)
         })
     } else {
       if (window.confirm(`${newName} is already added to phonebook, replace the old number with a new one?`)) {
         const oldPerson = persons.find(p => p.name === newName)
         const newObj = {name: newName, number: newNumber}
+
         personService
           .update(oldPerson.id, newObj)
           .then(updatedPerson => {
             setPersons(persons.map(person => person.id === oldPerson.id ? updatedPerson : person))
+            setNewName('')
+            setNewNumber('')
+            showNotification(`Updated phone number for ${updatedPerson.name}`, 4000)
           })
       }
     }
@@ -112,6 +147,7 @@ const App = () => {
   return (
     <div>
       <h2>Phonebook</h2>
+      <Notification message={infoMsg} />
       <Filter filterText={nameSelect} filterHandler={nameSelectHandler} />
       <h3>Add a new</h3>
       <PersonForm newName={newName} newNumber={newNumber} onNameChange={nameChangeHandler} onNumberChange={numberChangeHandler} onSubmit={addPersonHandler} />
