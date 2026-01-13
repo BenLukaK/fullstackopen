@@ -42,18 +42,18 @@ const Person = ({person, deleteHandler}) => {
 }
 
 const Notification = ({message}) => {
+  if (message === null) {
+    return null
+  }
+
   const infoStyle = {
-    color: 'green',
+    color: message.includes('already been removed') ? 'red' : 'green',
     background: 'lightgrey',
     fontSize: '20px',
     borderStyle: 'solid',
     borderRadius: '5px',
     padding: '10px',
     marginBottom: '10px'
-  }
-
-  if (message === null) {
-    return null
   }
 
   return (
@@ -127,6 +127,12 @@ const App = () => {
             setNewName('')
             setNewNumber('')
             showNotification(`Updated phone number for ${updatedPerson.name}`, 4000)
+          })
+          .catch(error => {
+            showNotification(`Information of ${newName} has already been removed from server`, 4000)
+            setPersons(persons.filter(person => person.name !== oldPerson.name))
+            setNewName('')
+            setNewNumber('')
           })
       }
     }
