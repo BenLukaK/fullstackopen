@@ -9,13 +9,13 @@ const SearchInput = (props) => {
   )
 }
 
-const DisplayController = ({filteredCountries, name}) => {
+const DisplayCountry = ({filteredCountries, name, showHandler}) => {
   const countryNum = filteredCountries.length
 
   if (countryNum > 10) {
     return <p>Too many matches, specify another filter</p>
   } else if (1 < countryNum && countryNum <= 10 ) {
-    return <ResultsList filteredCountries={filteredCountries} />
+    return <ResultsList filteredCountries={filteredCountries} showHandler={showHandler}/>
   } else if (countryNum === 1) {
     return <CountryDetail singleCountry={filteredCountries[0]} />
   } else if (name !== "" && countryNum === 0) {
@@ -25,12 +25,12 @@ const DisplayController = ({filteredCountries, name}) => {
   }
 }
 
-const ResultsList = ({filteredCountries}) => {
+const ResultsList = ({filteredCountries, showHandler}) => {
   return (
     <>
       {filteredCountries.map(country => 
         <div key={country.cca3}>
-          {country.name.common} <ShowButton />
+          {country.name.common} <ShowButton showHandler={() => showHandler(country)}/>
         </div>)}
     </>
   )
@@ -54,8 +54,10 @@ const CountryDetail = ({singleCountry}) => {
   )
 }
 
-const ShowButton = () => {
-  
+const ShowButton = ({showHandler}) => {
+  return (
+    <button onClick={showHandler}>Show</button>
+  )
 }
 
 const App = () => {
@@ -64,6 +66,10 @@ const App = () => {
 
   const onNameChange = (e) => {
     setName(e.target.value)
+  }
+
+  const showHandler = (country) => {
+    setName(country.name.common)
   }
 
   useEffect(() => {
@@ -79,7 +85,7 @@ const App = () => {
   return (
     <div>
       <SearchInput value={name} onChangeHandler={onNameChange} />
-      <DisplayController filteredCountries={filteredCountries} name={name} />
+      <DisplayCountry filteredCountries={filteredCountries} name={name} showHandler={showHandler}/>
     </div>
   )
 }
