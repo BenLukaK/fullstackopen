@@ -27,11 +27,12 @@ const DisplayController = ({filteredCountries, name}) => {
 
 const ResultsList = ({filteredCountries}) => {
   return (
-    <ul>
-      {filteredCountries.map(country => {
-        return <li key={country.cca3}>{country.name.common}</li>
-      })}
-    </ul>
+    <>
+      {filteredCountries.map(country => 
+        <div key={country.cca3}>
+          {country.name.common} <ShowButton />
+        </div>)}
+    </>
   )
 }
 
@@ -39,7 +40,7 @@ const CountryDetail = ({singleCountry}) => {
   return (
     <div>
       <h1>{singleCountry.name.common}</h1>
-      <div>Capital {singleCountry.capital.join(', ')}</div>
+      <div>Capital {singleCountry.capital ? singleCountry.capital.join(', ') : "N/A"}</div>
       <div>Area {singleCountry.area}</div>
       <h1>Languages</h1>
       <ul>
@@ -52,7 +53,11 @@ const CountryDetail = ({singleCountry}) => {
 
   )
 }
- 
+
+const ShowButton = () => {
+  
+}
+
 const App = () => {
   const [name, setName] = useState('')
   const [allCountries, setAllCountries] = useState([])
