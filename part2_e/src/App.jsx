@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import cntryServices from './services/countries'
+import weathServices from './services/weather'
 
 const SearchInput = (props) => {
   return (
@@ -37,10 +38,21 @@ const ResultsList = ({filteredCountries, showHandler}) => {
 }
 
 const CountryDetail = ({singleCountry}) => {
+  const capitalName = singleCountry.capital ? singleCountry.capital.join(', ') : "N/A"
+
+  const capitalPosition = singleCountry?.capitalInfo?.latlng
+  const [lat, lon] = capitalPosition || []
+
+  if (lat && lon) {
+    weathServices
+      .getCity(lat, lon)
+      .then(weatherData => console.log(weatherData))
+  }
+
   return (
     <div>
       <h1>{singleCountry.name.common}</h1>
-      <div>Capital {singleCountry.capital ? singleCountry.capital.join(', ') : "N/A"}</div>
+      <div>Capital  {capitalName}</div>
       <div>Area {singleCountry.area}</div>
       <h1>Languages</h1>
       <ul>
@@ -49,6 +61,8 @@ const CountryDetail = ({singleCountry}) => {
         })}
       </ul>
       <img src={singleCountry.flags.png} alt={singleCountry.flags.alt} />
+      <h1>Weather in {capitalName}</h1>
+      <div>{lat} {lon}</div>
     </div>
 
   )
@@ -58,6 +72,10 @@ const ShowButton = ({showHandler}) => {
   return (
     <button onClick={showHandler}>Show</button>
   )
+}
+
+const DisplayCaptitalWeather = () => {
+
 }
 
 const App = () => {

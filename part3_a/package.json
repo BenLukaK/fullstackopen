@@ -1,0 +1,22 @@
+{
+  "name": "contact_backend",
+  "version": "1.0.0",
+  "description": "NodeJS backend for part 2 persons exercise",
+  "keywords": [
+    "backend",
+    "full",
+    "stackopen"
+  ],
+  "license": "MIT",
+  "author": "Ben Gao",
+  "type": "commonjs",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "dev": "node --watch index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+    "express": "^5.2.1"
+  }
+}
