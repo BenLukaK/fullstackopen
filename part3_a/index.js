@@ -1,5 +1,6 @@
 
 const express = require('express')
+
 const app = express()
 
 let persons = [
@@ -24,6 +25,8 @@ let persons = [
       "number": "39-23-6423122"
     }
 ]
+
+app.use(express.json())
 
 app.get('/api/persons', (request, response) => {
     response.json(persons)
@@ -54,6 +57,40 @@ app.delete('/api/persons/:id', (request, response) => {
     persons = persons.filter(person => person.id !== id) 
 
     response.status(204).end()
+})
+
+app.post('/api/persons', (request, response) => {
+    const body = request.body
+
+    // if name or number is missing
+    if (!body.name || !body.number) {
+        return response.status(400).json({
+            error: 'Person name or number is missing'
+        })
+    } 
+
+    // if name already exists 
+    const nameExists = persons.some(
+        person => person.name.toLowerCase() === body.name.toLowerCase()
+    )
+
+    if (nameExists) {
+        return response.status(400).json({
+            error: 'Person name already exists'
+        })
+    }
+
+    // generate the new person and post to server
+    const randomId = Math.floor(Math.random() * 10000000000).toString()
+
+    const newPerson = {
+        id: randomId,
+        name: body.name, 
+        number: body.number
+    }
+
+    persons = persons.concat(newPerson)
+    response.status(201).json(newPerson)
 })
 
 const PORT = 3001
