@@ -5,3 +5,12 @@ Content-Type: application/json
     "name": "Luka Doncheci",
     "number": "56-38-41905593"
 }
+
+###
+POST https://fullstackopen-j4os.onrender.com/api/persons
+Content-Type: application/json 
+
+{
+    "name": "Ben Gao",
+    "number": "86-21-25786143"
+}
