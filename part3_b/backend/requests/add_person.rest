@@ -2,8 +2,17 @@ POST http://localhost:3001/api/persons
 Content-Type: application/json 
 
 {
-    "name": "Luka Doncheci",
+    "name": "Kelly Yuan",
     "number": "56-38-41905593"
+}
+
+###
+POST http://localhost:3001/api/persons
+Content-Type: application/json 
+
+{
+    "name": "Mike Brown",
+    "number": "86-21-25786143"
 }
 
 ###
@@ -11,6 +20,6 @@ POST https://fullstackopen-j4os.onrender.com/api/persons
 Content-Type: application/json 
 
 {
-    "name": "Ben Gao",
+    "name": "Mike Brown",
     "number": "86-21-25786143"
 }
