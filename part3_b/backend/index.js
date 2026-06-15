@@ -23,15 +23,16 @@ app.get('/api/persons', (request, response) => {
     })
 })
 
-/* 
-app.get('/info', (request, response) => {
-    const num = persons.length
-    const date = new Date()
 
-    response.send(`<p>Phonebook has info for ${num} people</p>
-                  <p>${date}</p>`)
+app.get('/info', (request, response) => {
+    Person.find({})
+      .then(persons => {
+        response.send(`<p>Phonebook has info for ${persons.length} people</p>
+                       <p>${new Date()}</p>`)
+      })
 })
- */
+ 
+
 app.get('/api/persons/:id', (request, response, next) => {
     Person.findById(request.params.id).then(person => {
         if (person) {
@@ -42,13 +43,6 @@ app.get('/api/persons/:id', (request, response, next) => {
     }).catch(error => next(error))
 })
 
-app.delete('/api/persons/:id', (request, response, next) => {
-    Person.findByIdAndDelete(request.params.id)
-      .then(person => {
-        response.status(204).end()
-    })
-    .catch(error => next(error))
-})
 
 app.post('/api/persons', (request, response) => {
     const body = request.body
@@ -60,17 +54,6 @@ app.post('/api/persons', (request, response) => {
         })
     } 
 
-    // if name already exists 
- /*    const nameExists = persons.some(
-        person => person.name.toLowerCase() === body.name.toLowerCase()
-    )
-
-    if (nameExists) {
-        return response.status(400).json({
-            error: 'Person name already exists'
-        })
-    } */
-
     // generate the new person and post to server
     const newPerson = new Person({ 
         name: body.name, 
@@ -81,6 +64,36 @@ app.post('/api/persons', (request, response) => {
         response.json(savedPerson)
     })
 }) 
+
+
+app.put('/api/persons/:id', (request, response, next) => {
+    const {name, number} = request.body
+
+    Person.findById(request.params.id) 
+      .then(person => {
+        if (!person) {
+            return response.status(404).end();
+        }
+
+        person.name = name 
+        person.number = number 
+
+        person.save().then(updatedPerson => {
+            response.json(updatedPerson)
+        })
+      }) 
+      .catch(error => next(error))
+
+
+})
+
+app.delete('/api/persons/:id', (request, response, next) => {
+    Person.findByIdAndDelete(request.params.id)
+      .then(person => {
+        response.status(204).end()
+    })
+    .catch(error => next(error))
+})
 
 const errorHandler = (error, request, response, next) => {
     console.error(error.message)
