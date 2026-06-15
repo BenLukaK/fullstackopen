@@ -47,7 +47,7 @@ const Notification = ({message}) => {
   }
 
   const infoStyle = {
-    color: message.includes('already been removed') ? 'red' : 'green',
+    color: message.includes('ERROR') ? 'red' : 'green',
     background: 'lightgrey',
     fontSize: '20px',
     borderStyle: 'solid',
@@ -115,6 +115,9 @@ const App = () => {
           setNewNumber('')
           showNotification(`Added ${newPerson.name}`, 4000)
         })
+        .catch(error => {
+          showNotification(`ERROR: ${error.response.data.error}`, 4000)
+        })
     } else {
       if (window.confirm(`${newName} is already added to phonebook, replace the old number with a new one?`)) {
         const oldPerson = persons.find(p => p.name === newName)
@@ -129,7 +132,7 @@ const App = () => {
             showNotification(`Updated phone number for ${updatedPerson.name}`, 4000)
           })
           .catch(error => {
-            showNotification(`Information of ${newName} has already been removed from server`, 4000)
+            showNotification(`ERROR: Information of ${newName} has already been removed from server`, 4000)
             setPersons(persons.filter(person => person.name !== oldPerson.name))
             setNewName('')
             setNewNumber('')
