@@ -1,28 +1,22 @@
 POST http://localhost:3001/api/blogs
 Content-Type: application/json 
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImJlbmdhbyIsImlkIjoiNmE1ZTNkNDQ4MDUzYmUyZWIyZTBjZGViIiwiaWF0IjoxNzg1MDU4NDUzfQ.VisEcFZHxuPlnWb-_JrTR6FikN3Xzqi6p9I-lAiKwCI
 
 {
-    "title": "Test 6 title",
-    "author": "Test 6 author",
-    "url": "Test 6 url",
-    "likes": 24
+    "title": "CellPhone",
+    "author": "Xiaogang Feng",
+    "url": "www.cellphone.com",
+    "likes": 32456
 }
 
 ###
-GET http://localhost:3001/api/blogs/6a3169b3c6e3352f1696f7b
-
-
-###
-DELETE http://localhost:3001/api/blogs/6a3169b3c6e3352f1696f7ba
-
-
-###
-PUT http://localhost:3001/api/blogs/6a316a08c6e3352f1696f7bb
-Content-Type: application/json
+POST http://localhost:3001/api/blogs
+Content-Type: application/json 
 
 {
-    "title": "Updated Title",
-    "author": "Updated Author",
-    "url": "Updated URL",
-    "likes": 99
+    "title": "Night Feast",
+    "author": "Kaige Chen",
+    "url": "www.nightfeast.com",
+    "likes": 6547872,
+    "userId": "6a5db97e7c4d09cee90e2a7b"
 }

@@ -1,0 +1,27 @@
+POST http://localhost:3001/api/users
+Content-Type: application/json 
+
+{
+    "username": "lukagao",
+    "name": "Luka Gao",
+    "password": "Lk0626"
+}
+
+###
+GET http://localhost:3001/api/blogs/6a3169b3c6e3352f1696f7b
+
+
+###
+DELETE http://localhost:3001/api/blogs/6a3169b3c6e3352f1696f7ba
+
+
+###
+PUT http://localhost:3001/api/blogs/6a316a08c6e3352f1696f7bb
+Content-Type: application/json
+
+{
+    "title": "Updated Title",
+    "author": "Updated Author",
+    "url": "Updated URL",
+    "likes": 99
+}

@@ -1,17 +1,27 @@
 const { test, after, beforeEach, describe } = require('node:test')
+const bcrypt = require('bcrypt')
 const assert = require('node:assert')
 const mongoose = require('mongoose')
 const supertest = require('supertest')
 const helper = require('./test_helper')
 const app = require('../app')
 const Blog = require('../models/blog')
+const User = require('../models/user')
 
 const api = supertest(app)
 
 
 describe('when there is initially some blogs saved', () => {
+  let testUserId
+
   beforeEach(async () => {
     await Blog.deleteMany({})
+    await User.deleteMany({})
+
+    const passwordHash = await bcrypt.hash('testpassword', 10)
+    const user = new User({ username: 'testuser', passwordHash })
+    const savedUser = await user.save()
+    testUserId = savedUser._id.toString()
 
     const blogObjects = helper.initialBlogs
       .map(blog => new Blog(blog))
@@ -82,6 +92,7 @@ describe('when there is initially some blogs saved', () => {
         author: "Xingchi Zhou",
         url: "www.kungfu.com",
         likes: 34546,
+        userId: testUserId,
       }
 
       await api
@@ -102,6 +113,7 @@ describe('when there is initially some blogs saved', () => {
         author: "Fan Guo",
         url: "www.planetearth.com",
         likes: 7657454,
+        userId: testUserId,
       }
 
       await api
@@ -118,6 +130,7 @@ describe('when there is initially some blogs saved', () => {
       const newBlog = {
         title: 'Superman vs Batman',
         author: 'Zack Schnider',
+        userId: testUserId,
       }
 
       await api
@@ -134,6 +147,7 @@ describe('when there is initially some blogs saved', () => {
         title: 'Saving Private Ryan',
         author: 'Tom Hanks',
         url: 'www.savingprivateryan.com',
+        userId: testUserId,
       }
 
       const response = await api
@@ -189,6 +203,95 @@ describe('when there is initially some blogs saved', () => {
 
       assert.strictEqual(response.body.likes, 4365)
     })
+  })
+
+
+})
+
+
+
+describe('when there is initially one user in db', () => {
+  beforeEach(async () => {
+    await User.deleteMany({})
+
+    const passwordHash = await bcrypt.hash('sekret', 10)
+    const user = new User({ username: 'root', passwordHash })
+
+    await user.save()
+  })
+
+  test('creation succeeds with a fresh username', async () => {
+    const usersAtStart = await helper.usersInDb()
+
+    const newUser = {
+      username: 'mluukkai',
+      name: 'Matti Luukkainen',
+      password: 'Salainen134',
+    }
+
+    await api
+      .post('/api/users')
+      .send(newUser)
+      .expect(201)
+      .expect('Content-Type', /application\/json/)
+
+    const usersAtEnd = await helper.usersInDb()
+    assert.strictEqual(usersAtEnd.length, usersAtStart.length + 1)
+
+    const usernames = usersAtEnd.map(u => u.username)
+    assert(usernames.includes(newUser.username))
+  })
+
+
+  test('creation fails with proper statuscode and message if username already taken', async () => {
+    const usersAtStart = await helper.usersInDb()
+
+    const newUser = {
+      username: 'root',
+      name: 'Superuser',
+      password: 'Salainen123',
+    }
+
+    const result = await api
+      .post('/api/users')
+      .send(newUser)
+      .expect(400)
+      .expect('Content-Type', /application\/json/)
+
+    const usersAtEnd = await helper.usersInDb()
+    assert(result.body.error.includes('expected `username` to be unique'))
+
+    assert.strictEqual(usersAtEnd.length, usersAtStart.length)
+  })
+
+  test('creation fails with too short username', async () => {
+    const newUser = {
+      username: 'be',
+      name: 'Ben',
+      password: 'Secret123',
+    }
+
+    const response = await api
+      .post('/api/users')
+      .send(newUser)
+      .expect(400)
+
+    assert(response.body.error.includes('shorter than the minimum allowed length'))
+  })
+
+  test('creation fails with too short password', async () => {
+    const newUser = {
+      username: 'ben',
+      name: 'Ben',
+      password: 'pw',
+    }
+
+    const response = await api
+      .post('/api/users')
+      .send(newUser)
+      .expect(400)
+
+    assert(response.body.error.includes('password must be at least 3 characters long'))
   })
 })
 
