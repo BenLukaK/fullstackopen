@@ -7,12 +7,14 @@ const helper = require('./test_helper')
 const app = require('../app')
 const Blog = require('../models/blog')
 const User = require('../models/user')
+const jwt = require('jsonwebtoken')
 
 const api = supertest(app)
 
 
 describe('when there is initially some blogs saved', () => {
   let testUserId
+  let testToken
 
   beforeEach(async () => {
     await Blog.deleteMany({})
@@ -23,8 +25,14 @@ describe('when there is initially some blogs saved', () => {
     const savedUser = await user.save()
     testUserId = savedUser._id.toString()
 
+    const userForToken = {username: savedUser.username, id: savedUser._id}
+    testToken = jwt.sign(userForToken, process.env.SECRET)
+
     const blogObjects = helper.initialBlogs
-      .map(blog => new Blog(blog))
+      .map(blog => new Blog({
+        ...blog, 
+        user: testUserId
+      }))
     const promiseArray = blogObjects.map(blog => blog.save())
     await Promise.all(promiseArray)
   })
@@ -92,11 +100,11 @@ describe('when there is initially some blogs saved', () => {
         author: "Xingchi Zhou",
         url: "www.kungfu.com",
         likes: 34546,
-        userId: testUserId,
       }
 
       await api
         .post('/api/blogs')
+        .set('Authorization', `Bearer ${testToken}`)
         .send(newBlog)
         .expect(201)
         .expect('Content-Type', /application\/json/)
@@ -108,16 +116,32 @@ describe('when there is initially some blogs saved', () => {
       assert(authors.includes('Xingchi Zhou'))
     })
 
+    test('fails with status code 401 if token missing', async () => {
+      const newBlog = {
+        author: "Kungfu Football",
+        url: "www.kungfufootball.com",
+        likes: 4354567,
+      }
+
+      await api
+        .post('/api/blogs')
+        .send(newBlog)
+        .expect(401)
+
+      const blogsAtEnd = await helper.blogsInDb()
+      assert.strictEqual(blogsAtEnd.length, helper.initialBlogs.length)
+    })
+
     test('fails with status code 400 if title missing', async () => {
       const newBlog = {
         author: "Fan Guo",
         url: "www.planetearth.com",
         likes: 7657454,
-        userId: testUserId,
       }
 
       await api
         .post('/api/blogs')
+        .set('Authorization', `Bearer ${testToken}`)
         .send(newBlog)
         .expect(400)
 
@@ -130,11 +154,11 @@ describe('when there is initially some blogs saved', () => {
       const newBlog = {
         title: 'Superman vs Batman',
         author: 'Zack Schnider',
-        userId: testUserId,
       }
 
       await api
         .post('/api/blogs')
+        .set('Authorization', `Bearer ${testToken}`)
         .send(newBlog)
         .expect(400)
 
@@ -147,11 +171,11 @@ describe('when there is initially some blogs saved', () => {
         title: 'Saving Private Ryan',
         author: 'Tom Hanks',
         url: 'www.savingprivateryan.com',
-        userId: testUserId,
       }
 
       const response = await api
         .post('/api/blogs')
+        .set('Authorization', `Bearer ${testToken}`)
         .send(newBlog)
         .expect(201)
 
@@ -171,6 +195,7 @@ describe('when there is initially some blogs saved', () => {
 
       await api
         .delete(`/api/blogs/${blogToDelete.id}`)
+        .set('Authorization', `Bearer ${testToken}`)
         .expect(204)
 
       const blogsAtEnd = await helper.blogsInDb()
